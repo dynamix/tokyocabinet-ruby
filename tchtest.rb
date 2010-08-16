@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------------------------
 # The test cases of the hash database API
-#                                                       Copyright (C) 2006-2009 Mikio Hirabayashi
+#                                                                Copyright (C) 2006-2010 FAL Labs
 # This file is part of Tokyo Cabinet.
 # Tokyo Cabinet is free software; you can redistribute it and/or modify it under the terms of
 # the GNU Lesser General Public License as published by the Free Software Foundation; either
@@ -340,6 +340,18 @@ def procmisc(path, rnum, opts, omode)
   hdb = HDB::new
   if !hdb.tune(rnum / 50, 2, -1, opts)
     eprint(hdb, "tune")
+    err = true
+  end
+  if !hdb.setcache(rnum / 10)
+    eprint(hdb, "setcache")
+    err = true
+  end
+  if !hdb.setxmsiz(rnum * 4)
+    eprint(hdb, "setxmsiz")
+    err = true
+  end
+  if !hdb.setdfunit(8)
+    eprint(hdb, "setdfunit")
     err = true
   end
   if !hdb.open(path, HDB::OWRITER | HDB::OCREAT | HDB::OTRUNC | omode)

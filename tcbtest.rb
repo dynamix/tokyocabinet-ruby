@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------------------------
 # The test cases of the B+ tree database API
-#                                                       Copyright (C) 2006-2009 Mikio Hirabayashi
+#                                                                Copyright (C) 2006-2010 FAL Labs
 # This file is part of Tokyo Cabinet.
 # Tokyo Cabinet is free software; you can redistribute it and/or modify it under the terms of
 # the GNU Lesser General Public License as published by the Free Software Foundation; either
@@ -342,6 +342,14 @@ def procmisc(path, rnum, opts, omode)
   end
   if !bdb.setcache(128, 256)
     eprint(bdb, "setcache")
+    err = true
+  end
+  if !bdb.setxmsiz(rnum * 4)
+    eprint(bdb, "setxmsiz")
+    err = true
+  end
+  if !bdb.setdfunit(8)
+    eprint(bdb, "setdfunit")
     err = true
   end
   if !bdb.open(path, BDB::OWRITER | BDB::OCREAT | BDB::OTRUNC | omode)

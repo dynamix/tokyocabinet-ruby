@@ -12,7 +12,7 @@ As for database of B+ tree, records whose keys are duplicated can be stored.  Ac
 
 As for database of fixed-length array, records are stored with unique natural numbers.  It is impossible to store two or more records with a key overlaps.  Moreover, the length of each record is limited by the specified length.  Provided operations are the same as ones of hash database.
 
-Table database is also provided as a variant of hash database.  Each record is identified by the primary key and has a set of named columns.  Although there is no concept of data schema, it is possible to search for records with complex conditions efficiently by using indexes of arbitrary columns.
+Table database is also provided as a variant of hash database.  Each record is identified by the primary key and has a set of named columns.  Although there is no concept of data schema, it is possible to search for records with complex conditions efficiently by using indices of arbitrary columns.
 
 === Setting
 
@@ -251,10 +251,59 @@ The following code is an example to use a table database.
    STDERR.printf("close error: %s\n", tdb.errmsg(ecode))
  end
 
+The following code is an example to use an abstract database.
+
+ require 'tokyocabinet'
+ include TokyoCabinet
+ 
+ # create the object
+ adb = ADB::new
+ 
+ # open the database
+ if !adb.open("casket.tch")
+   STDERR.printf("open error\n")
+ end
+ 
+ # store records
+ if !adb.put("foo", "hop") ||
+     !adb.put("bar", "step") ||
+     !adb.put("baz", "jump")
+   STDERR.printf("put error\n")
+ end
+ 
+ # retrieve records
+ value = adb.get("foo")
+ if value
+   printf("%s\n", value)
+ else
+   STDERR.printf("get error\n")
+ end
+ 
+ # traverse records
+ adb.iterinit
+ while key = adb.iternext
+   value = adb.get(key)
+   if value
+     printf("%s:%s\n", key, value)
+   end
+ end
+ 
+ # hash-like usage
+ adb["quux"] = "touchdown"
+ printf("%s\n", adb["quux"])
+ adb.each do |key, value|
+   printf("%s:%s\n", key, value)
+ end
+ 
+ # close the database
+ if !adb.close
+   STDERR.printf("close error\n")
+ end
+
 
 == LICENSE
 
- Copyright (C) 2006-2009 Mikio Hirabayashi
+ Copyright (C) 2006-2010 FAL Labs
  All rights reserved.
 
 Tokyo Cabinet is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License or any later version.  Tokyo Cabinet is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.  You should have received a copy of the GNU Lesser General Public License along with Tokyo Cabinet; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
